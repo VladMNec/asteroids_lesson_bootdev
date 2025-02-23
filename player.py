@@ -8,6 +8,8 @@ class Player(circleshape.CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.timer = 0
+        self.lives = PLAYER_LIVES
+        self.invuln = 0
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -19,6 +21,9 @@ class Player(circleshape.CircleShape):
 
     def draw(self, screen):
         pygame.draw.polygon(screen, (255, 255, 255), self.triangle(), width=2)
+        # change player color while respawn invulnerable
+        if self.invuln > 0:
+            pygame.draw.polygon(screen, (255, 0, 0), self.triangle(), width=2)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -26,6 +31,7 @@ class Player(circleshape.CircleShape):
     def update(self, dt):
         keys = pygame.key.get_pressed()
         self.timer -= dt
+        self.invuln -= dt
 
         if keys[pygame.K_a]:
             left = dt * -1
@@ -53,3 +59,14 @@ class Player(circleshape.CircleShape):
         shot = Shot(self.position.x, self.position.y)
         shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOT_SPEED
         self.timer = PLAYER_SHOT_COOLDOWN
+
+    def respawn(self):
+        # reset player to starting position and give period of invulnerability
+        if self.invuln <= 0:
+            self.invuln = 1.2
+            self.lives -= 1
+            self.position.x = SCREEN_WIDTH / 2
+            self.position.y = SCREEN_HEIGHT / 2
+
+        if self.lives == 0:
+            raise SystemExit("Game over!")
