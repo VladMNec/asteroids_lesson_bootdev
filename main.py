@@ -21,10 +21,13 @@ def main():
             if event.type == pygame.QUIT:
                 return
         pygame.Surface.fill(screen, (0, 0, 0))
-        player_sprite.draw(screen)
-        pygame.display.flip()
         frames = fps.tick(60)
         dt = frames / 1000
+        player_sprite.update(dt)
+        player_sprite.draw(screen)
+        pygame.display.flip()
+        
+        
 
 
 if __name__ == "__main__":
